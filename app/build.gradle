@@ -11,6 +11,7 @@ android {
         versionCode 1
         versionName "1.0"
 
+        buildConfigField("String", "API_KEY", API_KEY)
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -19,6 +20,10 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+    }
+    compileOptions {
+        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_1_8
     }
 }
 
@@ -41,14 +46,16 @@ dependencies {
 
     implementation "android.arch.lifecycle:extensions:$lifecycleExtensionVersion"
 
-    //Butterknife
-    implementation "com.jakewharton:butterknife:$butterknifeVersion"
-    annotationProcessor "com.jakewharton:butterknife-compiler:$butterknifeVersion"
+    // Butterknife
+//    implementation "com.jakewharton:butterknife:$butterknifeVersion"
+//    annotationProcessor "com.jakewharton:butterknife-compiler:$butterknifeVersion"
 
     //Retrofit
     implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
     implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
     implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofitVersion"
+
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.2.1'
 
     //Rxjava
     implementation "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
