@@ -46,9 +46,12 @@ dependencies {
 
     implementation "android.arch.lifecycle:extensions:$lifecycleExtensionVersion"
 
-    // Butterknife
-//    implementation "com.jakewharton:butterknife:$butterknifeVersion"
-//    annotationProcessor "com.jakewharton:butterknife-compiler:$butterknifeVersion"
+    //Cardview
+    implementation "androidx.cardview:cardview:1.0.0"
+
+    //Butterknife
+    implementation "com.jakewharton:butterknife:$butterknifeVersion"
+    annotationProcessor "com.jakewharton:butterknife-compiler:$butterknifeVersion"
 
     //Material
     implementation 'com.google.android.material:material:1.2.1'
