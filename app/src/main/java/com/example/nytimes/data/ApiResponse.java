@@ -7,7 +7,7 @@ public class ApiResponse {
     private String status;
     private String copyright;
     private Integer num_results;
-    private List<Results> results;
+    private List<Article> results;
 
 
 
@@ -35,11 +35,11 @@ public class ApiResponse {
         this.num_results = num_results;
     }
 
-    public List<Results> getResults() {
+    public List<Article> getResults() {
         return results;
     }
 
-    public void setResults(List<Results> results) {
+    public void setResults(List<Article> results) {
         this.results = results;
     }
 

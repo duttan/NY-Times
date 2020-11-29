@@ -2,12 +2,13 @@ package com.example.nytimes.data;
 
 import java.util.List;
 
-public class Results {
+public class Article {
 
     private String section;
     private String title;
     private String source;
     private String updated_date;
+    private String url;
     private List<Multimedia> multimedia;
 
     public String getSection() {
@@ -48,6 +49,14 @@ public class Results {
 
     public void setUpdated_date(String updated_date) {
         this.updated_date = updated_date;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
 }

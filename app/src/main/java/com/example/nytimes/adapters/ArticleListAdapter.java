@@ -1,5 +1,7 @@
 package com.example.nytimes.adapters;
 
+import android.content.Context;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -7,30 +9,29 @@ import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
+import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.bumptech.glide.Glide;
 import com.example.nytimes.R;
 import com.example.nytimes.data.Multimedia;
-import com.example.nytimes.data.Results;
-import com.example.nytimes.utils.ImageUtil;
+import com.example.nytimes.data.Article;
+import com.example.nytimes.utils.Util;
 
 import java.util.List;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class ArticleListAdapter extends RecyclerView.Adapter<ArticleListAdapter.ArticleViewHolder> {
 
-    private List<Results> newsarticles;
+    private List<Article> newsarticles;
+    private Context context;
 
-    public ArticleListAdapter(List<Results> articles) {
+    public ArticleListAdapter(List<Article> articles,Context context) {
         this.newsarticles = articles;
+        this.context = context;
     }
 
-    public void updateArticles(List<Results> updatedarticles) {
+    public void updateArticles(List<Article> updatedarticles) {
         newsarticles.clear();
         newsarticles.addAll(updatedarticles);
         notifyDataSetChanged();
@@ -45,6 +46,8 @@ public class ArticleListAdapter extends RecyclerView.Adapter<ArticleListAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ArticleViewHolder holder, int position) {
+
+        holder.configureViewHolder(holder,newsarticles.get(position));
         holder.bind(newsarticles.get(position));
 
     }
@@ -66,6 +69,9 @@ public class ArticleListAdapter extends RecyclerView.Adapter<ArticleListAdapter.
         @BindView(R.id.news_time)
         TextView timestamp;
 
+        @BindView(R.id.sourcetxt)
+        TextView source;
+
         @BindView(R.id.favourite_icon)
         CheckBox likebutton;
 
@@ -74,6 +80,7 @@ public class ArticleListAdapter extends RecyclerView.Adapter<ArticleListAdapter.
 
         private List<Multimedia> imageurls;
         private String image;
+        private String url;
 
 
         public ArticleViewHolder(@NonNull View itemView) {
@@ -81,7 +88,20 @@ public class ArticleListAdapter extends RecyclerView.Adapter<ArticleListAdapter.
             ButterKnife.bind(this, itemView);
         }
 
-        void bind(Results results) {
+        private void configureViewHolder(ArticleViewHolder viewHolder, Article currentItem) {
+
+            viewHolder.itemView.setOnClickListener(view -> {
+                url = currentItem.getUrl();
+                CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+                builder.setToolbarColor(context.getResources().getColor(R.color.colorPrimary));
+                CustomTabsIntent customTabsIntent = builder.build();
+                customTabsIntent.launchUrl(context, Uri.parse(url));
+
+            });
+
+        }
+
+        private void bind(Article results) {
             imageurls = results.getMultimedia();
 
             if(imageurls == null) { image = "";
@@ -89,9 +109,10 @@ public class ArticleListAdapter extends RecyclerView.Adapter<ArticleListAdapter.
                image = imageurls.get(1).getUrl().isEmpty() ? "" : imageurls.get(1).getUrl();
             }
 
+            source.setText(results.getSection());
             description.setText(results.getTitle());
-            ImageUtil.loadImage(newsimage,image);
-            timestamp.setText(results.getSection() + " | Published: "+results.getUpdated_date());
+            Util.loadImage(newsimage,image);
+            timestamp.setText("| Published: "+Util.formatTimestamp(results.getUpdated_date()));
 
         }
     }

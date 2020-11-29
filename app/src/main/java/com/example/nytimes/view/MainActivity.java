@@ -13,7 +13,7 @@ import android.widget.TextView;
 import com.example.nytimes.R;
 import com.example.nytimes.adapters.ArticleListAdapter;
 import com.example.nytimes.data.ApiResponse;
-import com.example.nytimes.data.Results;
+import com.example.nytimes.data.Article;
 import com.example.nytimes.viewmodel.ListViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.ArrayList;
@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         viewModel = ViewModelProviders.of(this).get(ListViewModel.class);
-        ArticleListAdapter adapter = new ArticleListAdapter(new ArrayList<>());
+        ArticleListAdapter adapter = new ArticleListAdapter(new ArrayList<>(),this);
 
         viewModel.fetchArticles();
 
@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
 
         viewModel.feeds.observe(this, apiResponse -> {
 
-            List<Results> results = apiResponse.getResults();
+            List<Article> results = apiResponse.getResults();
             Log.d("@@",results.get(1).toString());
 
 
