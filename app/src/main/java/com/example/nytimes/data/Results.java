@@ -7,6 +7,7 @@ public class Results {
     private String section;
     private String title;
     private String source;
+    private String updated_date;
     private List<Multimedia> multimedia;
 
     public String getSection() {
@@ -39,6 +40,14 @@ public class Results {
 
     public void setMultimedia(List<Multimedia> multimedia) {
         this.multimedia = multimedia;
+    }
+
+    public String getUpdated_date() {
+        return updated_date;
+    }
+
+    public void setUpdated_date(String updated_date) {
+        this.updated_date = updated_date;
     }
 
 }

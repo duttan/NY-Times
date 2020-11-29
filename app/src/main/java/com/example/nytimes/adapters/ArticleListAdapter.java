@@ -13,7 +13,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.nytimes.R;
+import com.example.nytimes.data.Multimedia;
 import com.example.nytimes.data.Results;
+import com.example.nytimes.utils.ImageUtil;
 
 import java.util.List;
 
@@ -61,11 +63,17 @@ public class ArticleListAdapter extends RecyclerView.Adapter<ArticleListAdapter.
         @BindView(R.id.description)
         TextView description;
 
+        @BindView(R.id.news_time)
+        TextView timestamp;
+
         @BindView(R.id.favourite_icon)
         CheckBox likebutton;
 
         @BindView(R.id.share_button)
         ImageButton sharebutton;
+
+        private List<Multimedia> imageurls;
+        private String image;
 
 
         public ArticleViewHolder(@NonNull View itemView) {
@@ -74,7 +82,17 @@ public class ArticleListAdapter extends RecyclerView.Adapter<ArticleListAdapter.
         }
 
         void bind(Results results) {
+            imageurls = results.getMultimedia();
+
+            if(imageurls == null) { image = "";
+            } else {
+               image = imageurls.get(1).getUrl().isEmpty() ? "" : imageurls.get(1).getUrl();
+            }
+
             description.setText(results.getTitle());
+            ImageUtil.loadImage(newsimage,image);
+            timestamp.setText(results.getSection() + " | Published: "+results.getUpdated_date());
+
         }
     }
 }
