@@ -35,6 +35,7 @@ ext {
      glideVersion = '4.9.0'
      rxJavaVersion = '2.1.1'
      daggerVersion = '2.14.1'
+     room_version = '1.1.1'
      mockitoVersion = '2.11.0'}
 
 dependencies {
@@ -45,6 +46,12 @@ dependencies {
     implementation "com.android.support:design:$supportVersion"
 
     implementation "android.arch.lifecycle:extensions:$lifecycleExtensionVersion"
+
+    //Room
+    implementation "android.arch.persistence.room:runtime:$room_version"
+    annotationProcessor "android.arch.persistence.room:compiler:$room_version"
+    implementation "android.arch.persistence.room:rxjava2:$room_version"
+    compileOnly "org.projectlombok:lombok:1.16.18"
 
     //Cardview
     implementation "androidx.cardview:cardview:1.0.0"

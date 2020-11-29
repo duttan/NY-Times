@@ -69,7 +69,6 @@ public class MainActivity extends AppCompatActivity {
 
         ArticleListAdapter adapter = new ArticleListAdapter(new ArrayList<>(),this);
         SearchListAdapter searchadapter = new SearchListAdapter(new ArrayList<>(),this);
-        MenuItem searchitem;
 
         actionBar = getSupportActionBar();
         setUpNavigation();
@@ -78,9 +77,15 @@ public class MainActivity extends AppCompatActivity {
         viewModel.refresh();
         loadingView.show();
         listError.setVisibility(View.GONE);
+        if(!Util.hasNetwork()) {
+            Toast.makeText(this,"Please check your internet connection!",Toast.LENGTH_LONG).show();
+        }
 
         refreshLayout.setOnRefreshListener(() -> {
             viewModel.refresh();
+            if(!Util.hasNetwork()) {
+                Toast.makeText(this,"Please check your internet connection!",Toast.LENGTH_LONG).show();
+            }
             refreshLayout.setRefreshing(false);
         });
 

@@ -99,6 +99,11 @@ public class ArticleListAdapter extends RecyclerView.Adapter<ArticleListAdapter.
 
             });
 
+            viewHolder.sharebutton.setOnClickListener(view -> {
+
+                Util.shareNews(context, currentItem.getUrl());
+            });
+
         }
 
         private void bind(Article results) {
