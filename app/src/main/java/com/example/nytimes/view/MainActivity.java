@@ -65,22 +65,22 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        actionBar = getSupportActionBar();
 
 
-        setUpNavigation();
-
-
-
-        viewModel = ViewModelProviders.of(this).get(ListViewModel.class);
         ArticleListAdapter adapter = new ArticleListAdapter(new ArrayList<>(),this);
         SearchListAdapter searchadapter = new SearchListAdapter(new ArrayList<>(),this);
+        MenuItem searchitem;
 
-        viewModel.fetchArticles();
+        actionBar = getSupportActionBar();
+        setUpNavigation();
+        viewModel = ViewModelProviders.of(this).get(ListViewModel.class);
 
-
+        viewModel.refresh();
+        loadingView.show();
+        listError.setVisibility(View.GONE);
 
         refreshLayout.setOnRefreshListener(() -> {
+            viewModel.refresh();
             refreshLayout.setRefreshing(false);
         });
 
@@ -92,11 +92,7 @@ public class MainActivity extends AppCompatActivity {
             articleList.setVisibility(View.VISIBLE);
 
             List<Article> results = apiResponse.getResults();
-            Log.d("@@",results.get(1).toString());
 
-
-            listError.setVisibility(View.GONE);
-            loadingView.hide();
             adapter.updateArticles(results);
         });
 
@@ -107,12 +103,27 @@ public class MainActivity extends AppCompatActivity {
             articleList.setVisibility(View.VISIBLE);
 
             List<SearchArticle> results = searchApiResponse.getResponse().getDocs();
-            Log.d("@@",results.get(1).toString());
 
-
-            listError.setVisibility(View.GONE);
-            loadingView.hide();
             searchadapter.updateArticles(results);
+        });
+
+
+        viewModel.newsLoadError.observe(this, isError -> {
+            if(isError != null) {
+                listError.setVisibility(isError ? View.VISIBLE : View.GONE);
+                if(isError){
+                Toast.makeText(this,"Please check your internet connection!",Toast.LENGTH_LONG).show();}
+            }
+        });
+
+        viewModel.loading.observe(this, isLoading -> {
+            if(isLoading != null) {
+                loadingView.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+                if(isLoading) {
+                    listError.setVisibility(View.GONE);
+                    articleList.setVisibility(View.GONE);
+                }
+            }
         });
     }
 
@@ -124,6 +135,12 @@ public class MainActivity extends AppCompatActivity {
         inflater.inflate(R.menu.search, menu);
 
         MenuItem item = menu.findItem(R.id.action_search);
+        item.setVisible(false);
+
+        if(actionBar.getTitle() == "Search") {
+            item.setVisible(true);
+        }
+
         Drawable drawable = ContextCompat.getDrawable(this, R.drawable.ic_search_black_24dp);
         drawable.setTint(ContextCompat.getColor(this, R.color.white));
         item.setIcon(drawable);
@@ -169,23 +186,27 @@ public class MainActivity extends AppCompatActivity {
     private void setUpNavigation() {
 
         navigationView.setOnNavigationItemSelectedListener(item -> {
+
             switch (item.getItemId()) {
                 case R.id.navigation_headline:
                     actionBar.setTitle("Headlines");
+                    invalidateOptionsMenu();
                     return true;
 
                 case R.id.navigation_search:
                     actionBar.setTitle("Search");
-
+                    invalidateOptionsMenu();
                     return true;
 
                 case R.id.navigation_category:
                     actionBar.setTitle("Category");
+                    invalidateOptionsMenu();
 
                     return true;
 
                 case R.id.navigation_favourite:
                     actionBar.setTitle("Favourite");
+                    invalidateOptionsMenu();
 
                     return true;
 
