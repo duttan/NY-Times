@@ -3,6 +3,8 @@ package com.example.nytimes.di;
 import com.example.nytimes.BuildConfig;
 import com.example.nytimes.data.api.NewsApi;
 import com.example.nytimes.data.api.NewsService;
+import com.example.nytimes.view.MainActivity;
+import com.example.nytimes.view.MainApplication;
 
 import java.util.logging.Level;
 
@@ -26,12 +28,15 @@ import retrofit2.converter.gson.GsonConverterFactory;
         public NewsApi provideNewsApi() {
 
 
+
             Interceptor apiKeyInterceptor = chain -> {
                 Request request = chain.request();
                 HttpUrl url = request.url().newBuilder().addQueryParameter("api-key", BuildConfig.API_KEY).build();
                 request = request.newBuilder().url(url).build();
                 return chain.proceed(request);
             };
+
+
 
             HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
             logging.level(HttpLoggingInterceptor.Level.BODY);
@@ -40,6 +45,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
                     .addInterceptor(apiKeyInterceptor)
                     .addInterceptor(logging)
                     .build();
+
 
 
             return new Retrofit.Builder()

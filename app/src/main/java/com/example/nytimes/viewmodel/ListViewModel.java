@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.nytimes.data.ApiResponse;
+import com.example.nytimes.data.SearchApiResponse;
 import com.example.nytimes.data.api.NewsApi;
 import com.example.nytimes.data.api.NewsService;
 import com.example.nytimes.di.DaggerApiComponent;
@@ -28,6 +29,7 @@ public class ListViewModel extends ViewModel {
     NewsService newsService;
 
     public MutableLiveData<ApiResponse> feeds = new MutableLiveData<ApiResponse>();
+    public MutableLiveData<SearchApiResponse> searchfeeds = new MutableLiveData<SearchApiResponse>();
 
     public ListViewModel() {
         super();
@@ -58,6 +60,34 @@ public class ListViewModel extends ViewModel {
 
                     }
                 });
+    }
+
+    public void fetchSearchArticles(String query)
+    {
+
+        newsService.getSearchArticles(query)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new SingleObserver<SearchApiResponse>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(SearchApiResponse apiResponse) {
+                        searchfeeds.setValue(apiResponse);
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.d("@@apifailure",e.getLocalizedMessage());
+
+
+                    }
+                });
+
     }
 
 

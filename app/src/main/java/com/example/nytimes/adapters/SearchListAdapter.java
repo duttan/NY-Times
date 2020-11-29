@@ -14,24 +14,25 @@ import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.nytimes.R;
 import com.example.nytimes.data.Multimedia;
-import com.example.nytimes.data.Article;
+import com.example.nytimes.data.SearchArticle;
+import com.example.nytimes.utils.Constants;
 import com.example.nytimes.utils.Util;
 
 import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class ArticleListAdapter extends RecyclerView.Adapter<ArticleListAdapter.ArticleViewHolder> {
+public class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.ArticleViewHolder> {
 
-    private List<Article> newsarticles;
+    private List<SearchArticle> newsarticles;
     private Context context;
 
-    public ArticleListAdapter(List<Article> articles,Context context) {
+    public SearchListAdapter(List<SearchArticle> articles,Context context) {
         this.newsarticles = articles;
         this.context = context;
     }
 
-    public void updateArticles(List<Article> updatedarticles) {
+    public void updateArticles(List<SearchArticle> updatedarticles) {
         newsarticles.clear();
         newsarticles.addAll(updatedarticles);
         notifyDataSetChanged();
@@ -54,7 +55,7 @@ public class ArticleListAdapter extends RecyclerView.Adapter<ArticleListAdapter.
 
     @Override
     public int getItemCount() {
-       return newsarticles.size();
+        return newsarticles.size();
     }
 
 
@@ -88,31 +89,29 @@ public class ArticleListAdapter extends RecyclerView.Adapter<ArticleListAdapter.
             ButterKnife.bind(this, itemView);
         }
 
-        private void configureViewHolder(ArticleViewHolder viewHolder, Article currentItem) {
+        private void configureViewHolder(ArticleViewHolder viewHolder, SearchArticle currentItem) {
 
             viewHolder.itemView.setOnClickListener(view -> {
-                url = currentItem.getUrl();
+                url = currentItem.getWeb_url();
                 CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
                 builder.setToolbarColor(context.getResources().getColor(R.color.colorPrimary));
                 CustomTabsIntent customTabsIntent = builder.build();
                 customTabsIntent.launchUrl(context, Uri.parse(url));
-
             });
 
         }
 
-        private void bind(Article results) {
+        private void bind(SearchArticle results) {
             imageurls = results.getMultimedia();
 
-            if(imageurls == null) { image = "";
+            if(imageurls == null || !(imageurls.size() > 0)) { image = "";
             } else {
-               image = imageurls.get(1).getUrl().isEmpty() ? "" : imageurls.get(1).getUrl(); }
+                image = imageurls.get(1).getUrl().isEmpty() ? "" : imageurls.get(1).getUrl(); }
 
-            source.setText(results.getSection() !=  null ? results.getSection() : "");
-            description.setText(results.getTitle() != null ? results.getTitle() : "");
-            Util.loadImage(newsimage,image);
-            timestamp.setText("| Published: "+Util.formatTimestamp(results.getUpdated_date()));
-
+            source.setText(results.getSource() !=  null ? results.getSource() : "");
+            description.setText(results.getSnippet() != null ? Util.shortenText(results.getSnippet()) : "");
+            Util.loadImage(newsimage, Constants.APPEND_URL_FOR_IMAGE+image);
         }
     }
 }
+
