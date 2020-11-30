@@ -141,18 +141,19 @@ public class ArticleListAdapter extends RecyclerView.Adapter<ArticleListAdapter.
                 builder.setToolbarColor(context.getResources().getColor(R.color.colorPrimary));
                 CustomTabsIntent customTabsIntent = builder.build();
                 customTabsIntent.launchUrl(context, Uri.parse(url));
+            });
 
-                Favourite favourite = new Favourite();
-                favourite.articles = currentItem;
-                int count = database.favoriteDao().isPresent(currentItem.getTitle());
-                viewHolder.likebutton.setChecked(count == 1);
-                viewHolder.likebutton.setOnCheckedChangeListener((compoundButton, isChecked) -> {
-                    if (isChecked)
-                        database.favoriteDao().insertFavourite(favourite);
-                    else
-                        database.favoriteDao().unfavouriteNews(currentItem.getTitle());
-                });
 
+            Favourite favourite = new Favourite();
+            favourite.articles = currentItem;
+            int count = database.favoriteDao().isPresent(currentItem.getTitle());
+            viewHolder.likebutton.setChecked(count == 1);
+            viewHolder.likebutton.setOnCheckedChangeListener((compoundButton, isChecked) -> {
+                if (isChecked)
+                    if(count!=1){
+                        database.favoriteDao().insertFavourite(favourite);}
+                else
+                    database.favoriteDao().unfavouriteNews(currentItem.getTitle());
             });
 
             viewHolder.sharebutton.setOnClickListener(view -> {

@@ -115,6 +115,7 @@ public class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.Ar
             } else {
                 image = imageurls.get(1).getUrl().isEmpty() ? "" : imageurls.get(1).getUrl(); }
 
+            likebutton.setVisibility(View.INVISIBLE);
             source.setText(results.getSource() !=  null ? results.getSource() : "");
             description.setText(results.getSnippet() != null ? Util.shortenText(results.getSnippet()) : "");
             Util.loadImage(newsimage, Constants.APPEND_URL_FOR_IMAGE+image);

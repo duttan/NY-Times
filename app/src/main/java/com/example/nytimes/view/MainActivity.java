@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
     private ActionBar actionBar;
     private AppDatabase db;
 
-    List<Article> listArticles = new ArrayList<>();
+    List<Article> favlistArticles = new ArrayList<>();
     ArticleListAdapter adapter;
     SearchListAdapter searchadapter;
 
@@ -81,6 +81,8 @@ public class MainActivity extends AppCompatActivity {
         adapter = new ArticleListAdapter(new ArrayList<>(),this,db);
         searchadapter = new SearchListAdapter(new ArrayList<>(),this);
 
+        favlistArticles = getSavedNews();
+
         actionBar = getSupportActionBar();
         setUpNavigation();
         viewModel = ViewModelProviders.of(this).get(ListViewModel.class);
@@ -93,9 +95,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         refreshLayout.setOnRefreshListener(() -> {
-            viewModel.refresh();
-            if(!Util.hasNetwork()) {
-                Toast.makeText(this,"Please check your internet connection!",Toast.LENGTH_LONG).show();
+            if(!actionBar.getTitle().equals("Favourite")) {
+                viewModel.refresh();
+                if (!Util.hasNetwork()) {
+                    Toast.makeText(this, "Please check your internet connection!", Toast.LENGTH_LONG).show();
+                }
             }
             refreshLayout.setRefreshing(false);
         });
@@ -216,19 +220,21 @@ public class MainActivity extends AppCompatActivity {
                     searchadapter.clearRecyclerView();
                     return true;
 
-                case R.id.navigation_category:
-                    actionBar.setTitle("Category");
-                    invalidateOptionsMenu();
-                    searchadapter.clearRecyclerView();
-
-                    return true;
+//                case R.id.navigation_category:
+//                    actionBar.setTitle("Category");
+//                    invalidateOptionsMenu();
+//                    searchadapter.clearRecyclerView();
+//
+//                    return true;
 
                 case R.id.navigation_favourite:
                     actionBar.setTitle("Favourite");
                     invalidateOptionsMenu();
                     articleList.setAdapter(adapter);
-                    adapter.updateArticles(getSavedNews());
-                    //adapter.setArticlesList(getSavedNews());
+                    adapter.clearRecyclerView();
+                    adapter.notifyDataSetChanged();
+                   // adapter.updateArticles(getSavedNews());
+                    adapter.setArticlesList(getSavedNews());
 
                     return true;
 
@@ -246,8 +252,8 @@ public class MainActivity extends AppCompatActivity {
         db = AppDatabase.getAppDatabase(this);
         List<Favourite> favouriteList = db.favoriteDao().getFavourites();
         for (int i = 0; i < favouriteList.size(); i++) {
-            listArticles.add(favouriteList.get(i).articles);
+            favlistArticles.add(favouriteList.get(i).articles);
         }
-        return listArticles;
+        return favlistArticles;
     }
 }

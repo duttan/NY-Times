@@ -14,11 +14,11 @@
         android:title="@string/search"
         app:showAsAction="always|withText"/>
 
-    <item
-        android:id="@+id/navigation_category"
-        android:icon="@drawable/ic_category"
-        android:title="@string/category"
-        app:showAsAction="always|withText"/>
+<!--    <item-->
+<!--        android:id="@+id/navigation_category"-->
+<!--        android:icon="@drawable/ic_category"-->
+<!--        android:title="@string/category"-->
+<!--        app:showAsAction="always|withText"/>-->
 
     <item
         android:id="@+id/navigation_favourite"
