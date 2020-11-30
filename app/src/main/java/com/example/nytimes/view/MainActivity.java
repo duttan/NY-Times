@@ -1,4 +1,17 @@
 package com.example.nytimes.view;
+
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.SearchView;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -9,38 +22,25 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.os.Build;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.SearchView;
-import android.widget.TextView;
-import android.widget.Toast;
-
 import com.example.nytimes.R;
 import com.example.nytimes.adapters.ArticleListAdapter;
+import com.example.nytimes.adapters.FavouriteListAdapter;
 import com.example.nytimes.adapters.SearchListAdapter;
 import com.example.nytimes.data.ApiResponse;
 import com.example.nytimes.data.Article;
-import com.example.nytimes.data.Docs;
 import com.example.nytimes.data.SearchArticle;
 import com.example.nytimes.data.db.AppDatabase;
 import com.example.nytimes.data.db.Favourite;
 import com.example.nytimes.utils.Util;
 import com.example.nytimes.viewmodel.ListViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.internal.Utils;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     List<Article> favlistArticles = new ArrayList<>();
     ArticleListAdapter adapter;
     SearchListAdapter searchadapter;
+    FavouriteListAdapter favadapter;
 
     @BindView(R.id.navigation)
     BottomNavigationView navigationView;
@@ -76,12 +77,9 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         db = AppDatabase.getAppDatabase(Objects.requireNonNull(this));
 
-
-
         adapter = new ArticleListAdapter(new ArrayList<>(),this,db);
         searchadapter = new SearchListAdapter(new ArrayList<>(),this);
-
-        favlistArticles = getSavedNews();
+        favadapter = new FavouriteListAdapter(new ArrayList<>(),this,db);
 
         actionBar = getSupportActionBar();
         setUpNavigation();
@@ -95,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         refreshLayout.setOnRefreshListener(() -> {
-            if(!actionBar.getTitle().equals("Favourite")) {
+            if(!actionBar.getTitle().equals("Favourite") && !actionBar.getTitle().equals("Search")) {
                 viewModel.refresh();
                 if (!Util.hasNetwork()) {
                     Toast.makeText(this, "Please check your internet connection!", Toast.LENGTH_LONG).show();
@@ -146,6 +144,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void init()
+    {
+        favlistArticles = getSavedNews();
+    }
+
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -211,30 +215,25 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.navigation_headline:
                     actionBar.setTitle("Headlines");
                     invalidateOptionsMenu();
+                    init();
                     viewModel.refresh();
                     return true;
 
                 case R.id.navigation_search:
                     actionBar.setTitle("Search");
                     invalidateOptionsMenu();
-                    searchadapter.clearRecyclerView();
+                    adapter.clearRecyclerView();
                     return true;
 
-//                case R.id.navigation_category:
-//                    actionBar.setTitle("Category");
-//                    invalidateOptionsMenu();
-//                    searchadapter.clearRecyclerView();
-//
-//                    return true;
 
                 case R.id.navigation_favourite:
                     actionBar.setTitle("Favourite");
                     invalidateOptionsMenu();
-                    articleList.setAdapter(adapter);
-                    adapter.clearRecyclerView();
-                    adapter.notifyDataSetChanged();
-                   // adapter.updateArticles(getSavedNews());
-                    adapter.setArticlesList(getSavedNews());
+                    init();
+                    articleList.setAdapter(favadapter);
+                    favadapter.clearRecyclerView();
+                    favadapter.updateArticles(favlistArticles);
+                    //adapter.setArticlesList(getSavedNews());
 
                     return true;
 
@@ -251,6 +250,7 @@ public class MainActivity extends AppCompatActivity {
     private List<Article> getSavedNews(){
         db = AppDatabase.getAppDatabase(this);
         List<Favourite> favouriteList = db.favoriteDao().getFavourites();
+        favlistArticles.clear();
         for (int i = 0; i < favouriteList.size(); i++) {
             favlistArticles.add(favouriteList.get(i).articles);
         }

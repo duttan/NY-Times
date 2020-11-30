@@ -24,13 +24,13 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class ArticleListAdapter extends RecyclerView.Adapter<ArticleListAdapter.ArticleViewHolder> {
+public class FavouriteListAdapter extends RecyclerView.Adapter<FavouriteListAdapter.ArticleViewHolder> {
 
     private List<Article> newsarticles;
     private Context context;
     private AppDatabase database;
 
-    public ArticleListAdapter(List<Article> articles, Context context, AppDatabase db) {
+    public FavouriteListAdapter(List<Article> articles, Context context, AppDatabase db) {
         this.newsarticles = articles;
         this.context = context;
         this.database = db;
@@ -71,7 +71,7 @@ public class ArticleListAdapter extends RecyclerView.Adapter<ArticleListAdapter.
                 }
             });
             newsarticles = newList;
-            result.dispatchUpdatesTo(ArticleListAdapter.this);
+            result.dispatchUpdatesTo(FavouriteListAdapter.this);
         }
     }
 
@@ -99,7 +99,7 @@ public class ArticleListAdapter extends RecyclerView.Adapter<ArticleListAdapter.
 
     @Override
     public int getItemCount() {
-       return newsarticles.size();
+        return newsarticles.size();
     }
 
 
@@ -151,10 +151,10 @@ public class ArticleListAdapter extends RecyclerView.Adapter<ArticleListAdapter.
 
             viewHolder.likebutton.setOnCheckedChangeListener((compoundButton, isChecked) -> {
                 if (isChecked){
-                    if(count == 0){
-                    database.favoriteDao().insertFavourite(favourite);}}
-                else{
-                   database.favoriteDao().unfavouriteNews(currentItem.getTitle());}
+                        if(count == 0){
+                        database.favoriteDao().insertFavourite(favourite);}}
+                    else{
+                        database.favoriteDao().unfavouriteNews(currentItem.getTitle());}
             });
 
             viewHolder.sharebutton.setOnClickListener(view -> {
@@ -168,7 +168,7 @@ public class ArticleListAdapter extends RecyclerView.Adapter<ArticleListAdapter.
 
             if(imageurls == null) { image = "";
             } else {
-               image = imageurls.get(1).getUrl().isEmpty() ? "" : imageurls.get(1).getUrl(); }
+                image = imageurls.get(1).getUrl().isEmpty() ? "" : imageurls.get(1).getUrl(); }
 
             source.setText(results.getSection() !=  null ? results.getSection() : "");
             description.setText(results.getTitle() != null ? Util.shortenText(results.getTitle()) : "");
