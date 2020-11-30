@@ -29,11 +29,15 @@ import com.example.nytimes.data.ApiResponse;
 import com.example.nytimes.data.Article;
 import com.example.nytimes.data.Docs;
 import com.example.nytimes.data.SearchArticle;
+import com.example.nytimes.data.db.AppDatabase;
+import com.example.nytimes.data.db.Favourite;
 import com.example.nytimes.utils.Util;
 import com.example.nytimes.viewmodel.ListViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.internal.Utils;
@@ -43,6 +47,11 @@ public class MainActivity extends AppCompatActivity {
     private ListViewModel viewModel;
     private ApiResponse response;
     private ActionBar actionBar;
+    private AppDatabase db;
+
+    List<Article> listArticles = new ArrayList<>();
+    ArticleListAdapter adapter;
+    SearchListAdapter searchadapter;
 
     @BindView(R.id.navigation)
     BottomNavigationView navigationView;
@@ -65,10 +74,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        db = AppDatabase.getAppDatabase(Objects.requireNonNull(this));
 
 
-        ArticleListAdapter adapter = new ArticleListAdapter(new ArrayList<>(),this);
-        SearchListAdapter searchadapter = new SearchListAdapter(new ArrayList<>(),this);
+
+        adapter = new ArticleListAdapter(new ArrayList<>(),this,db);
+        searchadapter = new SearchListAdapter(new ArrayList<>(),this);
 
         actionBar = getSupportActionBar();
         setUpNavigation();
@@ -196,22 +207,28 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.navigation_headline:
                     actionBar.setTitle("Headlines");
                     invalidateOptionsMenu();
+                    viewModel.refresh();
                     return true;
 
                 case R.id.navigation_search:
                     actionBar.setTitle("Search");
                     invalidateOptionsMenu();
+                    searchadapter.clearRecyclerView();
                     return true;
 
                 case R.id.navigation_category:
                     actionBar.setTitle("Category");
                     invalidateOptionsMenu();
+                    searchadapter.clearRecyclerView();
 
                     return true;
 
                 case R.id.navigation_favourite:
                     actionBar.setTitle("Favourite");
                     invalidateOptionsMenu();
+                    articleList.setAdapter(adapter);
+                    adapter.updateArticles(getSavedNews());
+                    //adapter.setArticlesList(getSavedNews());
 
                     return true;
 
@@ -223,5 +240,14 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    private List<Article> getSavedNews(){
+        db = AppDatabase.getAppDatabase(this);
+        List<Favourite> favouriteList = db.favoriteDao().getFavourites();
+        for (int i = 0; i < favouriteList.size(); i++) {
+            listArticles.add(favouriteList.get(i).articles);
+        }
+        return listArticles;
     }
 }

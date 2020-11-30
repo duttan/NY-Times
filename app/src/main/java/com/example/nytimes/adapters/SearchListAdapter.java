@@ -38,6 +38,11 @@ public class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.Ar
         notifyDataSetChanged();
     }
 
+    public void clearRecyclerView(){
+        newsarticles.clear();
+        notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public ArticleViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -88,6 +93,8 @@ public class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.Ar
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
+
+
 
         private void configureViewHolder(ArticleViewHolder viewHolder, SearchArticle currentItem) {
 

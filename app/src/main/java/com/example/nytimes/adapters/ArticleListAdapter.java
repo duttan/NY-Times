@@ -11,10 +11,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.browser.customtabs.CustomTabsIntent;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.nytimes.R;
 import com.example.nytimes.data.Multimedia;
 import com.example.nytimes.data.Article;
+import com.example.nytimes.data.db.AppDatabase;
+import com.example.nytimes.data.db.Favourite;
 import com.example.nytimes.utils.Util;
 
 import java.util.List;
@@ -25,10 +28,12 @@ public class ArticleListAdapter extends RecyclerView.Adapter<ArticleListAdapter.
 
     private List<Article> newsarticles;
     private Context context;
+    private AppDatabase database;
 
-    public ArticleListAdapter(List<Article> articles,Context context) {
+    public ArticleListAdapter(List<Article> articles, Context context, AppDatabase db) {
         this.newsarticles = articles;
         this.context = context;
+        this.database = db;
     }
 
     public void updateArticles(List<Article> updatedarticles) {
@@ -36,6 +41,46 @@ public class ArticleListAdapter extends RecyclerView.Adapter<ArticleListAdapter.
         newsarticles.addAll(updatedarticles);
         notifyDataSetChanged();
     }
+
+    public void setArticlesList(final List<Article> newList) {
+        if (newsarticles == null) {
+            newsarticles = newList;
+            notifyItemRangeInserted(0, newList.size());
+        } else {
+            DiffUtil.DiffResult result = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+                @Override
+                public int getOldListSize() {
+                    return newsarticles.size();
+                }
+
+                @Override
+                public int getNewListSize() {
+                    return newList.size();
+                }
+
+                @Override
+                public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+                    return newsarticles.get(oldItemPosition).getUrl()
+                            .equals(newList.get(newItemPosition).getUrl());
+                }
+
+                @Override
+                public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+                    return newsarticles.get(oldItemPosition)
+                            .equals(newList.get(newItemPosition));
+                }
+            });
+            newsarticles = newList;
+            result.dispatchUpdatesTo(ArticleListAdapter.this);
+        }
+    }
+
+    public void clearRecyclerView(){
+        newsarticles.clear();
+        notifyDataSetChanged();
+    }
+
+
 
     @NonNull
     @Override
@@ -97,6 +142,17 @@ public class ArticleListAdapter extends RecyclerView.Adapter<ArticleListAdapter.
                 CustomTabsIntent customTabsIntent = builder.build();
                 customTabsIntent.launchUrl(context, Uri.parse(url));
 
+                Favourite favourite = new Favourite();
+                favourite.articles = currentItem;
+                int count = database.favoriteDao().isPresent(currentItem.getTitle());
+                viewHolder.likebutton.setChecked(count == 1);
+                viewHolder.likebutton.setOnCheckedChangeListener((compoundButton, isChecked) -> {
+                    if (isChecked)
+                        database.favoriteDao().insertFavourite(favourite);
+                    else
+                        database.favoriteDao().unfavouriteNews(currentItem.getTitle());
+                });
+
             });
 
             viewHolder.sharebutton.setOnClickListener(view -> {
@@ -105,6 +161,8 @@ public class ArticleListAdapter extends RecyclerView.Adapter<ArticleListAdapter.
             });
 
         }
+
+
 
         private void bind(Article results) {
             imageurls = results.getMultimedia();
